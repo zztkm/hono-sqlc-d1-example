@@ -1,0 +1,22 @@
+{
+	"name": "hono-d1-example",
+	"version": "0.0.0",
+	"private": true,
+	"scripts": {
+		"init": "wrangler d1 execute d1-example --file ./schemas/schema.sql",
+		"init:local": "wrangler d1 execute d1-example --local --file ./schemas/schema.sql",
+		"dev": "wrangler dev",
+		"fmt": "prettier --write .",
+		"check": "prettier --check .",
+		"deploy": "wrangler deploy"
+	},
+	"devDependencies": {
+		"@cloudflare/workers-types": "^4.20230419.0",
+		"prettier": "^3.0.2",
+		"typescript": "^5.0.4",
+		"wrangler": "^3.0.0"
+	},
+	"dependencies": {
+		"hono": "^3.5.0"
+	}
+}
