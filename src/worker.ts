@@ -1,5 +1,7 @@
 import { Hono } from 'hono';
 
+import * as db from './gen/sqlc/querier';
+
 type Bindings = {
 	DB: D1Database;
 };
@@ -12,7 +14,7 @@ app.get('/api/posts/:slug/comments', async (c) => {
 	const slug = c.req.param('slug');
 	console.log(slug);
 	try {
-		const { results } = await c.env.DB.prepare('select * from comments where post_slug = ?').bind(slug).all();
+		const { results } = await db.listComments(c.env.DB, { postSlug: slug });
 		return c.json(results);
 	} catch (e) {
 		return c.json({ error: e }, 500);
@@ -27,12 +29,10 @@ app.post('/api/posts/:slug/comments', async (c) => {
 	if (!body) return c.json({ error: 'body is required' }, 400);
 
 	try {
-		const { success } = await c.env.DB.prepare('insert into comments (post_slug, author, body) values (?, ?, ?)')
-			.bind(slug, author, body)
-			.run();
+		const res = await db.createComment(c.env.DB, { postSlug: slug, author: author, body: body });
 
-		if (success) {
-			return c.json({ success: true });
+		if (res) {
+			return c.json({ success: true, id: res.id });
 		} else {
 			c.status(500);
 			return c.json({ error: 'failed to insert comment' });
