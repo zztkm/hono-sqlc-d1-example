@@ -123,6 +123,7 @@ export async function createComment(
       }}),
     }});
 }
+```
 
 one で生成すると、first で結果を取得するので、型が `Promise<T | null>` となって、D1Result にならないが、many で生成すると、`Promise<D1Result<T>>` となる。
 
