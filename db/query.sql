@@ -3,7 +3,7 @@ select *
 from comments
 where post_slug = @post_slug;
 
--- name: CreateComment :one
+-- name: CreateComment :many
 insert into comments 
 (
     post_slug, author, body

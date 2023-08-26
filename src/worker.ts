@@ -31,11 +31,18 @@ app.post('/api/posts/:slug/comments', async (c) => {
 	try {
 		const res = await db.createComment(c.env.DB, { postSlug: slug, author: author, body: body });
 
-		if (res) {
-			return c.json({ success: true, id: res.id });
+		if (res.success) {
+			if (res.results) {
+				// TODO: どうせ1件しか返ってこないので、results[0]で取得
+				return c.json({ success: true, id: res.results[0].id });
+			} else {
+				// NOTE: 返り値がない場合はエラーとしても良いのかな?
+				c.status(500);
+				return c.json({ error: 'failed to create comment' });
+			}
 		} else {
 			c.status(500);
-			return c.json({ error: 'failed to insert comment' });
+			return c.json({ error: 'failed to create comment' });
 		}
 	} catch (e) {
 		return c.json({ error: e }, 500);

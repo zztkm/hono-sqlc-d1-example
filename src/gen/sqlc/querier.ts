@@ -47,7 +47,7 @@ export async function listComments(
     }});
 }
 
-const createCommentQuery = `-- name: CreateComment :one
+const createCommentQuery = `-- name: CreateComment :many
 insert into comments 
 (
     post_slug, author, body
@@ -79,16 +79,19 @@ type RawCreateCommentRow = {
 export async function createComment(
   d1: D1Database,
   args: CreateCommentParams
-): Promise<CreateCommentRow | null> {
+): Promise<D1Result<CreateCommentRow>> {
   return await d1
     .prepare(createCommentQuery)
     .bind(args.postSlug, args.author, args.body)
-    .first<RawCreateCommentRow | null>()
-    .then((raw: RawCreateCommentRow | null) => raw ? {
-      id: raw.id,
-      author: raw.author,
-      body: raw.body,
-      postSlug: raw.post_slug,
-    } : null);
+    .all<RawCreateCommentRow>()
+    .then((r: D1Result<RawCreateCommentRow>) => { return {
+      ...r,
+      results: r.results.map((raw: RawCreateCommentRow) => { return {
+        id: raw.id,
+        author: raw.author,
+        body: raw.body,
+        postSlug: raw.post_slug,
+      }}),
+    }});
 }
 
