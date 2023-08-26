@@ -1,3 +1,8 @@
+-- name: GetComment :one
+select *
+from comments
+where id = @id;
+
 -- name: ListComments :many
 select *
 from comments

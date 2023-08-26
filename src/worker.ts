@@ -10,6 +10,17 @@ const app = new Hono<{ Bindings: Bindings }>();
 
 app.get('/api', (c) => c.text('Hello World!'));
 
+app.get('/api/comments/:id', async (c) => {
+	const id = +c.req.param('id');
+	try {
+		const row = await db.getComment(c.env.DB, { id: id });
+		if (!row) return c.json({ error: 'comment not found' }, 404);
+		return c.json(row);
+	} catch (e) {
+		return c.json({ error: e }, 500);
+	}
+});
+
 app.get('/api/posts/:slug/comments', async (c) => {
 	const slug = c.req.param('slug');
 	console.log(slug);
@@ -34,6 +45,7 @@ app.post('/api/posts/:slug/comments', async (c) => {
 		if (res.success) {
 			if (res.results) {
 				// TODO: どうせ1件しか返ってこないので、results[0]で取得
+				console.debug(res.results.length);
 				return c.json({ success: true, id: res.results[0].id });
 			} else {
 				// NOTE: 返り値がない場合はエラーとしても良いのかな?

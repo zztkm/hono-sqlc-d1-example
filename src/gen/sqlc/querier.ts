@@ -5,6 +5,45 @@
 
 import { D1Database, D1Result } from "@cloudflare/workers-types/experimental"
 
+const getCommentQuery = `-- name: GetComment :one
+select id, author, body, post_slug
+from comments
+where id = ?1`;
+
+export type GetCommentParams = {
+  id: number;
+};
+
+export type GetCommentRow = {
+  id: number;
+  author: string;
+  body: string;
+  postSlug: string;
+};
+
+type RawGetCommentRow = {
+  id: number;
+  author: string;
+  body: string;
+  post_slug: string;
+};
+
+export async function getComment(
+  d1: D1Database,
+  args: GetCommentParams
+): Promise<GetCommentRow | null> {
+  return await d1
+    .prepare(getCommentQuery)
+    .bind(args.id)
+    .first<RawGetCommentRow | null>()
+    .then((raw: RawGetCommentRow | null) => raw ? {
+      id: raw.id,
+      author: raw.author,
+      body: raw.body,
+      postSlug: raw.post_slug,
+    } : null);
+}
+
 const listCommentsQuery = `-- name: ListComments :many
 select id, author, body, post_slug
 from comments
