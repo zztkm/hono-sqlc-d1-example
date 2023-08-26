@@ -55,3 +55,79 @@ pnpm run fmt
 ```sh
 pnpm run deploy
 ```
+
+## Note
+
+### returing ありで insert したときに D1Result 型を受け取りたい
+
+以下のように返り値を `one` にすると、返り値の型が `Promise<T | null>` になってしまう。
+
+```sql
+-- name: CreateComment :one
+insert into comments 
+(
+    post_slug, author, body
+) values (
+    @post_slug, @author, @body
+)
+returning *;
+```
+生成コード
+```ts
+export async function createComment(
+  d1: D1Database,
+  args: CreateCommentParams
+): Promise<CreateCommentRow | null> {
+  return await d1
+    .prepare(createCommentQuery)
+    .bind(args.postSlug, args.author, args.body)
+    .first<RawCreateCommentRow | null>()
+    .then((raw: RawCreateCommentRow | null) => raw ? {
+      id: raw.id,
+      author: raw.author,
+      body: raw.body,
+      postSlug: raw.post_slug,
+    } : null);
+}
+```
+
+`many` にすると、`Promise<D1Result<T>>` になる。
+```sql
+-- name: CreateComment :many
+insert into comments 
+(
+    post_slug, author, body
+) values (
+    @post_slug, @author, @body
+)
+returning *;
+```
+
+欲しかった生成コード
+```ts
+export async function createComment(
+  d1: D1Database,
+  args: CreateCommentParams
+): Promise<D1Result<CreateCommentRow>> {
+  return await d1
+    .prepare(createCommentQuery)
+    .bind(args.postSlug, args.author, args.body)
+    .all<RawCreateCommentRow>()
+    .then((r: D1Result<RawCreateCommentRow>) => { return {
+      ...r,
+      results: r.results.map((raw: RawCreateCommentRow) => { return {
+        id: raw.id,
+        author: raw.author,
+        body: raw.body,
+        postSlug: raw.post_slug,
+      }}),
+    }});
+}
+
+one で生成すると、first で結果を取得するので、型が `Promise<T | null>` となって、D1Result にならないが、many で生成すると、`Promise<D1Result<T>>` となる。
+
+https://twitter.com/voluntas/status/1694572903545844084?s=20
+
+## Troubleshooting
+
+`better-sqlite3` のインストールに失敗したら -> https://github.com/WiseLibs/better-sqlite3/blob/master/docs/troubleshooting.md
