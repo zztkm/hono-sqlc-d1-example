@@ -23,7 +23,7 @@ wrangler d1 create d1-example
 
 create migration file
 ```
-wrangler d1 migrations create --local d1-example init
+wrangler d1 migrations create d1-example init
 ```
 
 db init (first migration)
