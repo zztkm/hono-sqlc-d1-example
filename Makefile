@@ -17,7 +17,7 @@ $(GOBIN)/sqlc:
 	go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
 
 .PHONY: init
-local-init: $(GOBIN)/sqlc
+local-init:
 	wrangler d1 migrations apply --local d1-example
 
 .PHONY: local-migration-list
