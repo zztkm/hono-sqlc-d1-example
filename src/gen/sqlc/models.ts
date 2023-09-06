@@ -9,5 +9,6 @@ export type Comments = {
   body: string;
   postSlug: string;
   createdAt: string | null;
+  updatedAt: string | null;
 };
 

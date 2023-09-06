@@ -6,7 +6,7 @@
 import { D1Database, D1Result } from "@cloudflare/workers-types/experimental"
 
 const getCommentQuery = `-- name: GetComment :one
-select id, author, body, post_slug, created_at
+select id, author, body, post_slug, created_at, updated_at
 from comments
 where id = ?1`;
 
@@ -20,6 +20,7 @@ export type GetCommentRow = {
   body: string;
   postSlug: string;
   createdAt: string | null;
+  updatedAt: string | null;
 };
 
 type RawGetCommentRow = {
@@ -28,6 +29,7 @@ type RawGetCommentRow = {
   body: string;
   post_slug: string;
   created_at: string | null;
+  updated_at: string | null;
 };
 
 export async function getComment(
@@ -44,11 +46,12 @@ export async function getComment(
       body: raw.body,
       postSlug: raw.post_slug,
       createdAt: raw.created_at,
+      updatedAt: raw.updated_at,
     } : null);
 }
 
 const listCommentsQuery = `-- name: ListComments :many
-select id, author, body, post_slug, created_at
+select id, author, body, post_slug, created_at, updated_at
 from comments
 where post_slug = ?1`;
 
@@ -62,6 +65,7 @@ export type ListCommentsRow = {
   body: string;
   postSlug: string;
   createdAt: string | null;
+  updatedAt: string | null;
 };
 
 type RawListCommentsRow = {
@@ -70,6 +74,7 @@ type RawListCommentsRow = {
   body: string;
   post_slug: string;
   created_at: string | null;
+  updated_at: string | null;
 };
 
 export async function listComments(
@@ -88,6 +93,7 @@ export async function listComments(
         body: raw.body,
         postSlug: raw.post_slug,
         createdAt: raw.created_at,
+        updatedAt: raw.updated_at,
       }}),
     }});
 }
@@ -99,7 +105,7 @@ insert into comments
 ) values (
     ?1, ?2, ?3
 )
-returning id, author, body, post_slug, created_at`;
+returning id, author, body, post_slug, created_at, updated_at`;
 
 export type CreateCommentParams = {
   postSlug: string;
@@ -113,6 +119,7 @@ export type CreateCommentRow = {
   body: string;
   postSlug: string;
   createdAt: string | null;
+  updatedAt: string | null;
 };
 
 type RawCreateCommentRow = {
@@ -121,6 +128,7 @@ type RawCreateCommentRow = {
   body: string;
   post_slug: string;
   created_at: string | null;
+  updated_at: string | null;
 };
 
 export async function createComment(
@@ -139,6 +147,7 @@ export async function createComment(
         body: raw.body,
         postSlug: raw.post_slug,
         createdAt: raw.created_at,
+        updatedAt: raw.updated_at,
       }}),
     }});
 }

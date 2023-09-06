@@ -1,9 +1,11 @@
 MIGRATION_NAME=init
-D1_UUID=$(wrangler d1 list | grep d1-example | awk '{print $1}')
+GET_D1_LIST_JSON := wrangler d1 list --json
+JQ_FILTER := jq -r '.[] | select(.name == "d1-example") | .uuid'
+D1_UUID := $(shell $(GET_D1_LIST_JSON) | $(JQ_FILTER))
 GOBIN ?= $(shell go env GOPATH)/bin
 
 echo: 
-	echo ${D1_UUID}
+	@echo ${D1_UUID}
 
 .PHONY: compile
 compile: $(GOBIN)/sqlc
@@ -26,7 +28,7 @@ local-migration-list:
 
 .PHONY: local-migration
 local-migration: $(GOBIN)/sqlite3def
-	sqlite3def --dry-run .wrangler/state/v3/d1/${D1_UUID}/db.sqlite < ./db/schema.sql > ./migrations/`date +%Y%m%d%H%M%S`_${MIGRATION_NAME}.sql
+	sqlite3def --dry-run .wrangler/state/v3/d1/${D1_UUID}/db.sqlite < ./db/schema.sql > ./migrations/`date +%Y%m%d%H%M%S`.sql
 	wrangler d1 migrations apply --local d1-example
 
 .PHONY: migration
