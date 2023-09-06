@@ -6,7 +6,7 @@
 import { D1Database, D1Result } from "@cloudflare/workers-types/experimental"
 
 const getCommentQuery = `-- name: GetComment :one
-select id, author, body, post_slug
+select id, author, body, post_slug, created_at
 from comments
 where id = ?1`;
 
@@ -19,6 +19,7 @@ export type GetCommentRow = {
   author: string;
   body: string;
   postSlug: string;
+  createdAt: string | null;
 };
 
 type RawGetCommentRow = {
@@ -26,6 +27,7 @@ type RawGetCommentRow = {
   author: string;
   body: string;
   post_slug: string;
+  created_at: string | null;
 };
 
 export async function getComment(
@@ -41,11 +43,12 @@ export async function getComment(
       author: raw.author,
       body: raw.body,
       postSlug: raw.post_slug,
+      createdAt: raw.created_at,
     } : null);
 }
 
 const listCommentsQuery = `-- name: ListComments :many
-select id, author, body, post_slug
+select id, author, body, post_slug, created_at
 from comments
 where post_slug = ?1`;
 
@@ -58,6 +61,7 @@ export type ListCommentsRow = {
   author: string;
   body: string;
   postSlug: string;
+  createdAt: string | null;
 };
 
 type RawListCommentsRow = {
@@ -65,6 +69,7 @@ type RawListCommentsRow = {
   author: string;
   body: string;
   post_slug: string;
+  created_at: string | null;
 };
 
 export async function listComments(
@@ -82,6 +87,7 @@ export async function listComments(
         author: raw.author,
         body: raw.body,
         postSlug: raw.post_slug,
+        createdAt: raw.created_at,
       }}),
     }});
 }
@@ -93,7 +99,7 @@ insert into comments
 ) values (
     ?1, ?2, ?3
 )
-returning id, author, body, post_slug`;
+returning id, author, body, post_slug, created_at`;
 
 export type CreateCommentParams = {
   postSlug: string;
@@ -106,6 +112,7 @@ export type CreateCommentRow = {
   author: string;
   body: string;
   postSlug: string;
+  createdAt: string | null;
 };
 
 type RawCreateCommentRow = {
@@ -113,6 +120,7 @@ type RawCreateCommentRow = {
   author: string;
   body: string;
   post_slug: string;
+  created_at: string | null;
 };
 
 export async function createComment(
@@ -130,6 +138,7 @@ export async function createComment(
         author: raw.author,
         body: raw.body,
         postSlug: raw.post_slug,
+        createdAt: raw.created_at,
       }}),
     }});
 }

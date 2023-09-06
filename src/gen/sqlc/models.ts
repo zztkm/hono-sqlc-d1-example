@@ -8,5 +8,6 @@ export type Comments = {
   author: string;
   body: string;
   postSlug: string;
+  createdAt: string | null;
 };
 

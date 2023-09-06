@@ -6,24 +6,42 @@ refs:
 - https://developers.cloudflare.com/d1/examples/d1-and-hono/#
 - https://hono.dev/getting-started/cloudflare-workers#bindings
 - [CloudFlare Workers、Cloudflare D1、HonoでLINE botを作りました](https://tkancf.com/blog/creating-line-bot-with-cloudflare-workers-d1-and-hono/)
-- [voluntas/sqlc-gen-ts-d1-spec](https://github.com/voluntas/sqlc-gen-ts-d1-spec/tree/main)
+- [voluntas/sqlc-gen-ts-d1-spec](https://github.com/voluntas/sqlc-gen-ts-d1-spec)
 - [orisano/sqlc-gen-ts-d1](https://github.com/orisano/sqlc-gen-ts-d1)
 - [Getting started with SQLite — sqlc 1.20.0 documentation](https://docs.sqlc.dev/en/latest/tutorials/getting-started-sqlite.html)
+- [Migrations · Cloudflare D1 docs](https://developers.cloudflare.com/d1/platform/migrations/#migrations)
 
 
 ## Commands
 
 ### init d1
 
-```sh
-wrangler d1 execute d1-example --file ./schemas/schema.sql
+create db
+```
+wrangler d1 create d1-example
 ```
 
-pnpm dev の前に実行しておく
-for local:
+create migration file
+```
+wrangler d1 migrations create --local d1-example init
+```
 
+db init (first migration)
+※ 一番最初のマイグレーションファイルは `db/schema.sql` をコピーして作る必要がある
 ```sh
-wrangler d1 execute d1-example --local --file ./schemas/schema.sql
+make local-init
+```
+
+### migrations
+
+migration for local db
+```
+make local-migration
+```
+
+migration for production db
+```
+make migration
 ```
 
 ### sqlc
@@ -57,6 +75,20 @@ pnpm run deploy
 ```
 
 ## Note
+
+### migration について
+
+だいたいの流れ
+
+1. 最初に schema 定義を書く
+2. d1 migrations create する
+3. 生成された最初の migration file に schema 定義をコピー
+4. d1 migrations apply する (実行前に list で確認しておく
+5. schema を修正
+6. sqldef など使って、マイグレーションクエリを生成
+7. d1 migrations apply する
+
+これ以降は 5 ~ 7 のサイクル
 
 ### returing ありで insert したときに D1Result 型を受け取りたい
 
