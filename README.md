@@ -10,6 +10,8 @@ refs:
 - [orisano/sqlc-gen-ts-d1](https://github.com/orisano/sqlc-gen-ts-d1)
 - [Getting started with SQLite — sqlc 1.20.0 documentation](https://docs.sqlc.dev/en/latest/tutorials/getting-started-sqlite.html)
 - [Migrations · Cloudflare D1 docs](https://developers.cloudflare.com/d1/platform/migrations/#migrations)
+- migration のアイデア
+  - https://github.com/chimame/workers-remix-d1/blob/main/scripts/migration.sh
 
 
 ## Commands
